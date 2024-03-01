@@ -74,7 +74,6 @@ int updateMu(double *mu, double *DB, int *association, int d, int K, int n,int e
 
 /*kmeans*/
 void kmeans(double *DB, int d, int K, int n, int iter,int ep,double *mu){ 
-    /*initiate mu:*/
     int count = 0;
     int deltaCondition;
     int i,j;
