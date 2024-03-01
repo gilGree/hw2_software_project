@@ -90,12 +90,12 @@ void kmeans(double *DB, int d, int K, int n, int iter,int ep,double *mu){
 static PyObject *fit(PyObject *self, PyObject *args) {
     PyObject *py_point,*py_centroids,*point,*item,*py_mu_to_return;
     int d,K,n,iter,ep,len,i;
-    /* If the argument does not match the specified PyObject type, it will throw a TypeError */
+    /* check if we managed to pass them well*/
     if (!PyArg_ParseTuple(args, "OOiiiid", &py_point, &py_centroids, &max_iter, &n, &d, &k, &ep))
         return NULL;
-    if (!PyList_Check(py_centroids)) /*check if its an instance of a subtype of the list type*/
+    if (!PyList_Check(py_centroids)) /*check if its an instance of a subtype of list*/
        return NULL;
-    if (!PyList_Check(py_points)) /*check if its an instance of a subtype of the list type*/
+    if (!PyList_Check(py_points)) /*check if its an instance of a subtype of list*/
         return NULL;
     
     /*allocate space*/
