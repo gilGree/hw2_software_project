@@ -165,7 +165,7 @@ static PyMethodDef capiMethods[] = {
     {"fit",                   
       (PyCFunction) fit,
       METH_VARARGS,         
-      PyDoc_STR("expected input (in this order): points, centroids, max_iter, number of point, dimension of points,number of cluster points, epsilon")},
+      PyDoc_STR("the function claculates kmeans++, and the expected inputs are (in this order): points, init mu, max_iter, number of point, dimension of points,number of cluster points, epsilon")},
     {NULL, NULL, 0, NULL}     
 };
 
