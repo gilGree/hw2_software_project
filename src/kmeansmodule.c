@@ -76,7 +76,6 @@ int updateMu(double *mu, double *DB, int *association, int d, int K, int n,int e
 void kmeans(double *DB, int d, int K, int n, int iter,int ep,double *mu){ 
     int count = 0;
     int deltaCondition;
-    int i,j;
     int *association = (int *)malloc(n*sizeof(int));;
 
     do{
@@ -87,25 +86,32 @@ void kmeans(double *DB, int d, int K, int n, int iter,int ep,double *mu){
 }
 
 static PyObject *fit(PyObject *self, PyObject *args) {
-    PyObject *py_point,*py_centroids,*point,*item,*py_mu_to_return;
-    int d,K,n,iter,ep,len,i;
-    /* check if we managed to pass them well*/
-    if (!PyArg_ParseTuple(args, "OOiiiid", &py_point, &py_centroids, &max_iter, &n, &d, &k, &ep))
-        return NULL;
-    if (!PyList_Check(py_centroids)) /*check if its an instance of a subtype of list*/
-       return NULL;
-    if (!PyList_Check(py_points)) /*check if its an instance of a subtype of list*/
-        return NULL;
-    
+    PyObject *py_points,*py_centroids,*point,*item,*py_centroinds2return;
+    int d,K,n,iter,i,j;
+    double ep;
     /*allocate space*/
-    double *DB = (double *)malloc(n*d * sizeof(double));
-    int *mu = (double *)malloc(K*d * sizeof(double));
-
-    if (DB == NULL||mu==NULL) {
-        printf("Memory allocation failed. Exiting.\n");
+    double *DB,*mu;
+    /* check if we managed to pass them well*/
+    if (!PyArg_ParseTuple(args, "OOiiiid", &py_points, &py_centroids, &iter, &n, &d, &K, &ep)){
+        printf("An Error Has Occurred1\n");
+        return NULL;
+    }
+    if (!PyList_Check(py_centroids)){ /*check if its an instance of a subtype of list*/
+        printf("An Error Has Occurred2\n");
+        return NULL;
+    }
+    if (!PyList_Check(py_points)){ /*check if its an instance of a subtype of list*/
+        printf("An Error Has Occurred3\n");
         return NULL;
     }
 
+    DB = (double *)malloc(n*d * sizeof(double));
+    mu = (double *)malloc(K*d * sizeof(double));
+
+    if (DB == NULL||mu==NULL) {
+        printf("An Error Has Occurred\n");
+        return NULL;
+    }
     /* get input points from python */
     for (i = 0; i < n; i++) {
         point = PyList_GetItem(py_points, i); /* get the row */
@@ -115,10 +121,9 @@ static PyObject *fit(PyObject *self, PyObject *args) {
         /* save point in points */
         for (j = 0; j < d; j++) {
             item = PyList_GetItem(point, j);
-            points[i*d + j] = PyFloat_AsDouble(item);
+            DB[i*d + j] = PyFloat_AsDouble(item);
         }
     }
-
     /* get input centroids from python */
     for (i = 0; i < K; i++) {
         point = PyList_GetItem(py_centroids, i); /* get the row */
@@ -131,34 +136,36 @@ static PyObject *fit(PyObject *self, PyObject *args) {
             mu[i*d + j] = PyFloat_AsDouble(item);
         }
     }
-    kmeans(DB,d,K,n,iter,ep,mu)
+    kmeans(DB,d,K,n,iter,ep,mu);
     free(DB);
-    py_centroinds2return = PyList_New(k); /* create a list */
-    if (py_centroinds2return == NULL)
+    py_centroinds2return = PyList_New(K); /* create a list */
+    if (py_centroinds2return == NULL){
+        printf("An Error Has Occurred\n");
         return NULL;
-    for (i = 0; i < k; i++)
+    }
+    for (i = 0; i < K; i++)
     {
-        py_centroid = PyList_New(d); /* create a row */
-        if (py_centroid == NULL)
+        point = PyList_New(d); /* create a row */
+        if (point == NULL){
+       	    printf("An Error Has Occurred\n");
             return NULL;
+        }
         for (j = 0; j < d; j++)/*copying the row*/
         {
-            PyList_SetItem(py_centroid, j, Py_BuildValue("d", mu[i*d+j]));
+            PyList_SetItem(point, j, Py_BuildValue("d", mu[i*d+j]));
         }
-        PyList_SetItem(py_centroinds2return, i, Py_BuildValue("O", py_centroid)); /* adding the row */
+        PyList_SetItem(py_centroinds2return, i, Py_BuildValue("O", point)); /* adding the row */
     }
     free(mu);
-    
     return py_centroinds2return;
 }
 
 
 static PyMethodDef capiMethods[] = {
     {"fit",                   
-      (PyCFunction) kmeans,
+      (PyCFunction) fit,
       METH_VARARGS,         
-      PyDoc_STR("expected input (in this order): points, centroids, max_iter, number of point, dimension of points
-      ,number of cluster points, epsilon")},
+      PyDoc_STR("expected input (in this order): points, centroids, max_iter, number of point, dimension of points,number of cluster points, epsilon")},
     {NULL, NULL, 0, NULL}     
 };
 
@@ -171,7 +178,7 @@ static struct PyModuleDef moduledef = {
     capiMethods
 };
 
-PyMODINIT_FUNC PyInit_capi_keams(void)
+PyMODINIT_FUNC PyInit_mykmeanssp(void)
 {
     PyObject *m;
     m = PyModule_Create(&moduledef);
