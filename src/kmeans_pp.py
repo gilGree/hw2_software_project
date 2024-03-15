@@ -83,7 +83,6 @@ def main():
     mu = []
     for i in range(len(chosen_indices)):
         mu.append(DB[chosen_indices[i]])
-    mu.reverse()
     mu = mk.fit(DB, mu, max_iter, n, d, K, ep)
     for i in range(len(mu)):
         for j in range(len(mu[i])-1):
