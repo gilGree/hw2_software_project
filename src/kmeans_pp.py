@@ -13,7 +13,7 @@ def input_user():
     elif len(sys.argv) == 5:
         temp_k = sys.argv[1]
         ep = sys.argv[2]
-        max_iter = 300
+        max_iter = "300"
         file_name1 = sys.argv[3]
         file_name2 = sys.argv[4]
     assert((temp_k.isdigit())and(int(temp_k)>1)), "invalid number of clusters!"
