@@ -67,7 +67,10 @@ def main():
     chosen_indices.append(center_index)
 
     while(len(chosen_indices) < K):
-        distances = [np.linalg.norm(center - df.iloc[i].values) if i not in chosen_indices else 0 for i in range(n)]# dist to center
+        distances = [np.linalg.norm(center - df.iloc[i].values) if i not in chosen_indices else 0 for i in range(n)]# dist to newest center
+        for j in chosen_indices:
+            maybe_better_distances = [np.linalg.norm(df.iloc[j].values - df.iloc[i].values) if i not in chosen_indices else 0 for i in range(n)]
+            distances = [min(maybe_better_distances[i], distances[i]) for i in range(len(distances))]
         D = sum(distances)
         probabilities = np.array([float(x)/D for x in distances])# as required
         center_index  = np.random.choice(a=np.array([x for x in range(n)]), p=probabilities)# update as required 
